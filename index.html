@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./main.css" />
+    <link
+      rel="stylesheet"
+      href="./font-awesome-4.7.0/css/font-awesome.min.css"
+    />
+    <script src="./vue.js"></script>
+    <title>Mine Sweeper</title>
+  </head>
+  <body>
+    <div id="app">
+      <h2>Mine Sweeper</h2>
+
+      <div class="btn-square">
+        <div class="btn" @click="init">New Game</div>
+        <div class="btn" @click="setLevel('easy')">Easy</div>
+        <div class="btn" @click="setLevel('medium')">Medium</div>
+        <div class="btn" @click="setLevel('hard')">Hard</div>
+      </div>
+
+      <div class="info">
+        <div>
+          <i class="fa fa-clock-o fa-1x"></i>
+          <p>{{duration}}</p>
+        </div>
+        <div>
+          <i class="fa fa-bomb fa-1x"></i>
+          <p>{{remainNum}}</p>
+        </div>
+      </div>
+
+      <div class="block-square">
+        <div class="block-row" v-for="x in game.row">
+          <div
+            class="block"
+            v-for="y in game.col"
+            @click="sweep(x-1,y-1)"
+            @contextmenu.prevent="toggleFlag(x-1,y-1)"
+          >
+            <div v-if="game.mineList.length>0">
+              <div v-if="game.mineList[x-1][y-1].show">
+                <div
+                  v-if="game.mineList[x-1][y-1].mine"
+                  :class="{'bg-mine':game.mineList[x-1][y-1].mine}"
+                >
+                  <i class="fa fa-bomb"></i>
+                </div>
+                <div
+                  v-else
+                  :style="{'color':fontColor[game.mineList[x-1][y-1].num]}"
+                  :class="{'bg-trans':game.mineList[x-1][y-1].show}"
+                >
+                  {{game.mineList[x-1][y-1].num}}
+                </div>
+              </div>
+              <div v-else-if="game.mineList[x-1][y-1].flag">
+                <i class="fa fa-flag"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="./main.js"></script>
+  </body>
+</html>
