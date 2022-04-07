@@ -48,8 +48,8 @@ const app = new Vue({
     init() {
       this.initState();
       this.initMineList();
-      this.randomMines(this.game.mineAmount);
-      this.calcuNum();
+      // this.randomMines(this.game.mineAmount); 第一次点击时才生成地雷
+      // this.calcuNum(); 计算周围雷数要放在生成地雷之后
     },
     initState() {
       this.game.state = "ready";
@@ -73,14 +73,15 @@ const app = new Vue({
         Vue.set(this.game.mineList, i, b);
       }
     },
-    randomMines(amount) {
+    randomMines(amount, init_x, init_y) {
       let num = 0;
       const array = [];
+      const init_pos = init_x + "," + init_y;
       while (num < this.game.mineAmount) {
         let x = this.randomNum(this.game.row);
         let y = this.randomNum(this.game.col);
         const idx = x + "," + y;
-        if (!array.includes(idx)) {
+        if (!array.includes(idx) && init_pos !== idx) {
           array.push(idx);
           num++;
         }
@@ -125,7 +126,7 @@ const app = new Vue({
       return count;
     },
     sweep(x, y) {
-      if (!this.gameStateCheck()) return;
+      if (!this.gameStateCheck(x, y)) return;
       const block = this.game.mineList[x][y];
       if (block.flag) return;
       block.show = true;
@@ -160,9 +161,10 @@ const app = new Vue({
     checkWinState() {
       const blocks = this.game.mineList.flat();
       const win = !blocks.some((block) => !block.mine && !block.show);
-      // console.log(win);
       if (win) {
-        alert("you win!");
+        setTimeout(() => {
+          alert("you win!");
+        }, 10);
         clearInterval(this.game.timer);
         this.game.state = "end";
       }
@@ -206,10 +208,12 @@ const app = new Vue({
       }
       this.init();
     },
-    gameStateCheck() {
+    gameStateCheck(x, y) {
       if (this.game.state === "end") return false;
       if (this.game.state === "play") return true;
       this.game.state = "play";
+      this.randomMines(this.game.mineAmount, x, y);
+      this.calcuNum();
       this.setTimer();
       return true;
     },
